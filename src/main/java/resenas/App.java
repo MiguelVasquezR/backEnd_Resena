@@ -5,12 +5,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import resenas.dao.*;
 import resenas.modelo.Persona;
+import resenas.modelo.RedSocial;
 import resenas.modelo.Usuario;
 
+import java.sql.SQLOutput;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 import static spark.Spark.*;
 
@@ -41,13 +46,33 @@ public class App {
         before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
         //  ----------------------------------------------------- Personas
-        get("/personas", (request, response) -> {
-            return gson.toJson(daoPersona.getPersonas());
+        get("/persona", (request, response) -> {
+            String id = request.queryParams("id");
+            Persona p = daoPersona.searchPersona(id);
+            return gson.toJson(p);
+        });
+
+        put("/persona", (request, response) -> {
+            JsonObject jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
+            String id = jsonObject.get("id").getAsString();
+            Persona persona = gson.fromJson(request.body(), Persona.class);
+            persona.setIDPersona(id);
+            persona.setfNacimiento(parseDate(request.body()));
+
+            if (daoPersona.updatePersona(persona)){
+                System.out.println("Listo");
+            }else{
+                System.out.println("Error");
+            }
+
+            return "";
         });
 
         //  ----------------------------------------------------- Usuarios
-        get("/usuario", (request, response) -> {
-            return gson.toJson(daoUsuario.getUsuarios());
+        post("/usuario", (request, response) -> {
+            Usuario usuario = gson.fromJson(request.body(), Usuario.class);
+            Usuario usuario1 = daoUsuario.searchUser(usuario.getUsuario());
+            return gson.toJson(usuario1);
         });
 
         post("/usuario-personales", (request, response) -> {
@@ -75,21 +100,48 @@ public class App {
 
         post("/usuario-genero", (request, response) -> {
             String datos = request.body();
-            String soloTexto = datos.replaceAll("[\\[\\]\"]", "");
-            String[] textosSeparados = soloTexto.split(",");
-            for (int i=0; i<textosSeparados.length; i++){
-                String idGen = daoGeneroUsuario.searchGenero(textosSeparados[i]);
-                daoGeneroUsuario.addGeneros(randomID(), idUsuario, idGen);
+            if (!datos.equals("Sin genero")){
+                String soloTexto = datos.replaceAll("[\\[\\]\"]", "");
+                String[] textosSeparados = soloTexto.split(",");
+                for (int i=0; i<textosSeparados.length; i++){
+                    String idGen = daoGeneroUsuario.searchGenero(textosSeparados[i]);
+                    daoGeneroUsuario.addGeneros(randomID(), idUsuario, idGen);
+                }
             }
             return "";
         });
 
         put("/usuario", (request, response) -> {
-            return gson.toJson(daoUsuario.getUsuarios());
+            JsonObject jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
+            String idUsuario = jsonObject.get("idUsuario").getAsString();
+            String idPersona = jsonObject.get("idPersona").getAsString();
+            Usuario usuario = gson.fromJson(request.body(), Usuario.class);
+            usuario.setIDUsuario(idUsuario);
+            usuario.setIDPersona(idPersona);
+            if (daoUsuario.updateUser(usuario)){
+                System.out.println("Listo");
+            }else{
+                System.out.println("Usuario error");
+            }
+            return "";
         });
 
-        delete("/usuario", (request, response) -> {
-            return gson.toJson(daoUsuario.getUsuarios());
+        post("/red-social", (request, response) -> {
+            System.out.println(request.body());
+            RedSocial redSocial = gson.fromJson(request.body(), RedSocial.class);
+            redSocial.setIDRed(randomID());
+            String msj;
+            if (daoUsuario.addRedSocial(redSocial)){
+                msj = "Agregado";
+            }else{
+                msj = "Error al agregar";
+            }
+            System.out.println(msj);
+            return msj;
+        });
+
+        get("/red-social", (request, response) -> {
+           return  gson.toJson(daoUsuario.getRedSocial(request.queryParams("IDUsuario")));
         });
 
 

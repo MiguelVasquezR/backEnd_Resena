@@ -220,3 +220,5 @@ SELECT * FROM informacionpersonal;
 SELECT * FROM usuario;
 SELECT * FROM generosusuario;
 SELECT * FROM genero;
+
+select * from usuario as u, generosusuario as g where u.IDUsuario = g.IDUsuario;
