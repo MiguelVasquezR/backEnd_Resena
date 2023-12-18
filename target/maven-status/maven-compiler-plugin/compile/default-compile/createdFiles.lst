@@ -1,7 +1,5 @@
 resenas\modelo\Usuario.class
+resenas\dao\DAOPersona.class
 resenas\conexion\Conexion.class
 resenas\modelo\Autor.class
 resenas\modelo\Persona.class
-resenas\App.class
-resenas\dao\DAOPersona.class
-resenas\dao\DAOUsuario.class
