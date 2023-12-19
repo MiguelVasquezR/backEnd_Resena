@@ -7,10 +7,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import resenas.dao.*;
-import resenas.modelo.Lista;
-import resenas.modelo.Persona;
-import resenas.modelo.RedSocial;
-import resenas.modelo.Usuario;
+import resenas.modelo.*;
 import spark.Request;
 
 import javax.servlet.MultipartConfigElement;
@@ -40,6 +37,7 @@ public class App {
     static DAOGeneroUsuario daoGeneroUsuario = new DAOGeneroUsuario();
     static DAOGeneros daoGeneros = new DAOGeneros();
     static DAOLista daoLista = new DAOLista();
+    static DAOLibro daoLibro = new DAOLibro();
     static String idPersona;
     static String idUsuario;
 
@@ -210,6 +208,17 @@ public class App {
             }
             jsonObject.addProperty("Msj", msj);
             return jsonObject;
+        });
+
+        //---------------------------------------------------------------- libros
+        get("libros", (request, response) -> {
+            return gson.toJson(daoLibro.getLibros());
+        });
+
+        get("/libros/genero", (request, response) -> {
+            String genero = request.queryParams("genero");
+            Genero idGenero = daoGeneros.getGenero(genero);
+            return gson.toJson(daoLibro.getLibrosByGenero(idGenero.getIDGenero()));
         });
 
     }
