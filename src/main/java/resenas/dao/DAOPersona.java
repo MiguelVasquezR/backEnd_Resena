@@ -186,5 +186,30 @@ public class DAOPersona {
         }
     }
 
+    public boolean updatePersonaBiografia(String biografia, String IDPersona){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("update informacionpersonal as p set Biografia=? where p.id = ?");
+            ps.setString(1, biografia);
+            ps.setString(2, IDPersona);
+            int res = ps.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }finally {
+            try{
+                connection.close();
+                ps.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
 
 }

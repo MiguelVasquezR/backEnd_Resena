@@ -72,4 +72,32 @@ public class DAOLibro {
         }
     }
 
+    public ArrayList getLibrosByAutor(String id){
+        ArrayList<Libro> libros = new ArrayList<>();
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select * from libro where IDAutor = ?;");
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+            Libro libro;
+            while (rs.next()){
+                libro = new Libro();
+                libro.setIDLibro(rs.getString(1));
+                libro.setTitulo(rs.getString(2));
+                libro.setFoto(rs.getString(3));
+                libro.setNumPag(rs.getInt(4));
+                libro.setFechaPublicacion(rs.getDate(5));
+                libro.setIdioma(rs.getString(6));
+                libro.setEditorial(rs.getString(7));
+                libro.setIDAutor(rs.getString(8));
+                libro.setIDGenero(rs.getString(9));
+                libros.add(libro);
+            }
+            return libros;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
 }

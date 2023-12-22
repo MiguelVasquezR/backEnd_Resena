@@ -3,28 +3,13 @@ package resenas;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import resenas.dao.*;
 import resenas.modelo.*;
-import spark.Request;
 
-import javax.servlet.MultipartConfigElement;
-import javax.swing.*;
-import javax.swing.text.html.ImageView;
-import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 
 import static spark.Spark.*;
 
@@ -38,6 +23,7 @@ public class App {
     static DAOGeneros daoGeneros = new DAOGeneros();
     static DAOLista daoLista = new DAOLista();
     static DAOLibro daoLibro = new DAOLibro();
+    static DAOResena daoResena = new DAOResena();
     static String idPersona;
     static String idUsuario;
 
@@ -77,6 +63,19 @@ public class App {
             }
 
             return "";
+        });
+
+        post("/add-biografia", (request, response) -> {
+            String biografia = request.queryParams("biografia");
+            String IDPersona = request.queryParams("IDPersona");
+            JsonObject jsonObject = new JsonObject();
+            if (daoPersona.updatePersonaBiografia(biografia, IDPersona)){
+                jsonObject.addProperty("MSJ", "Se ha actualizado");
+            }else{
+                jsonObject.addProperty("MSJ", "No se ha actualizado");
+            }
+            System.out.println(jsonObject);
+            return jsonObject;
         });
 
         // ----------------------------------------------------- Usuarios
@@ -156,26 +155,37 @@ public class App {
         });
 
         // ----------------------------------------------------- Autores
-        get("/autor", (request, response) -> {
-            return gson.toJson(daoAutor.getAutores());
+        get("/nombre-autores", (request, response) -> {
+            String id = request.queryParams("id");
+
+            //return gson.toJson(jsonObject);
+            return "";
         });
 
-        post("/autor", (request, response) -> {
-            return gson.toJson(daoAutor.getCompletAutor());
+        post("/autor-datos", (request, response) -> {
+            String nombre = request.queryParams("nombre");
+            String[] nombreDiv = nombre.split(" ");
+
+
+            JsonObject jsonObject = daoAutor.getNombreAutores(nombreDiv[0], nombreDiv[1]);
+            if ( jsonObject != null){
+                return jsonObject;
+            }else {
+                return "";
+            }
         });
 
-        put("/autor", (request, response) -> {
-            return gson.toJson(daoAutor.getCompletAutor());
-        });
-
-        delete("/autor", (request, response) -> {
-            return gson.toJson(daoAutor.getCompletAutor());
-        });
 
         // --------------------------------------------------------- Géneros
         get("/genero", (request, response) -> {
             String nombre = request.queryParams("Nombre").toString();
             return gson.toJson(daoGeneros.getGenero(nombre));
+        });
+
+
+        get("/generos-usuario", (request, response) -> {
+            String idUsuario = request.queryParams("IDUsuario");
+            return gson.toJson(daoGeneros.getGeneroU(idUsuario));
         });
 
         // ------------------------------------------------------------ Lista
@@ -221,6 +231,46 @@ public class App {
             return gson.toJson(daoLibro.getLibrosByGenero(idGenero.getIDGenero()));
         });
 
+        get("/libros/autor", (request, response) -> {
+            String idautor = request.queryParams("autor");
+            System.out.println(idautor);
+            return gson.toJson(daoLibro.getLibrosByAutor(idautor));
+        });
+
+
+        //---------------------------------------------------------------------- Resenas
+
+        post("/crear-resena", (request, response) -> {
+            String IDUsuario = request.queryParams("IDUsuario");
+            Resena resena = gson.fromJson(request.body(), Resena.class);
+            resena.setID(randomID());
+            resena.setIDUsuario(IDUsuario);
+            java.util.Date utilDate = new java.util.Date();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            resena.setFecha(sqlDate);
+            String msj;
+            if (daoResena.crearResena(resena)){
+                msj = "Guardado";
+            }else{
+                msj = "Error";
+            }
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("Msj", msj);
+            return jsonObject;
+        });
+
+        get("/get-resenas", (request, response) -> {
+            String id = request.queryParams("IDUsuario");
+            return gson.toJson(daoResena.getResenas(id));
+        });
+
+    }
+
+    private String getDateString(Date date){
+        Date fechaActual = new Date();
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
+        String fechaFormateada = formatoFecha.format(fechaActual);
+        return fechaFormateada;
     }
 
     private static Date parseDate(String datos) {

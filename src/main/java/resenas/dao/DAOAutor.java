@@ -1,8 +1,9 @@
 package resenas.dao;
 
+import com.google.gson.JsonObject;
 import resenas.conexion.Conexion;
 import resenas.modelo.Autor;
-import resenas.modelo.Usuario;
+import resenas.modelo.Persona;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -73,21 +74,62 @@ public class DAOAutor {
         }
     }
 
-    public List getAutores(){
-        ArrayList<Autor> autors = new ArrayList<>();
+    public Persona getNombreAutores(String id){
         try{
             connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from Autor");
+            ps = connection.prepareStatement("SELECT I.ID, I.Nombre, I.ApellidoPaterno, I.ApellidoMaterno FROM INFORMACIONPERSONAL AS I, AUTOR AS A WHERE I.ID = A.IDPersona and A.IDAutor = ?;");
+            ps.setString(1, id);
             rs = ps.executeQuery();
-            Autor autor;
-            while (rs.next()){
-                autor = new Autor();
-                autor.setIDAutor(rs.getString(1));
-                autor.setNacionalidad(rs.getString(2));
-                autor.setIDPersona(rs.getString(3));
-                autors.add(autor);
+            Persona persona;
+            if(rs.next()){
+                persona = new Persona();
+                persona.setIDPersona(rs.getString(1));
+                persona.setNombre(rs.getString(2));
+                persona.setPaterno(rs.getString(3));
+                persona.setMaterno(rs.getString(4));
+                System.out.println(persona.toString());
+                return persona;
+            }else{
+                return null;
             }
-            return autors;
+        }catch(SQLException e){
+            System.out.println(msj + e.getMessage());
+            return null;
+        }catch (Exception e){
+            System.out.println(msj + e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection.close();
+            }catch (SQLException e){
+                System.out.println(msj + e.getMessage());
+            }
+        }
+    }
+
+    public JsonObject getNombreAutores(String nombre, String apellido){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select i.Nombre, i.ApellidoPaterno, i.ApellidoMaterno, a.IDAutor, i.FechaNacimiento, i.FechaDeceso, i.Biografia, a.nacionalidad from InformacionPersonal as i, Autor as a where i.Nombre = ? and i.ApellidoPaterno = ? and i.ID = a.IDPersona");
+            ps.setString(1, nombre);
+            ps.setString(2, apellido);
+            rs = ps.executeQuery();
+            JsonObject jsonObject;
+            if(rs.next()){
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("nombre", rs.getString(1));
+                jsonObject.addProperty("paterno", rs.getString(2));
+                jsonObject.addProperty("materno", rs.getString(3));
+                jsonObject.addProperty("IDAutor", rs.getString(4));
+                jsonObject.addProperty("nacimiento", rs.getString(5));
+                jsonObject.addProperty("deceso", rs.getString(6));
+                jsonObject.addProperty("biografia", rs.getString(7));
+                jsonObject.addProperty("nacionalidad", rs.getString(8));
+
+                return jsonObject;
+            }else{
+                return null;
+            }
         }catch(SQLException e){
             System.out.println(msj + e.getMessage());
             return null;
@@ -126,4 +168,28 @@ public class DAOAutor {
         }
     }
 
+    public String getID(String persona) {
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select IDAutor from autor where IDPersona = ?");
+            ps.setString(1, persona);
+            rs = ps.executeQuery();
+            if (rs.next()){
+                return rs.getString(1);
+            }else{
+                return "";
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return "";
+        }finally{
+            try{
+                connection.close();
+                ps.close();
+                rs.close();
+            }catch (SQLException e){
+                System.out.println(msj + e.getMessage());
+            }
+        }
+    }
 }
