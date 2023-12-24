@@ -16,7 +16,7 @@ public class DAOAutor {
 
     Conexion conexion = new Conexion();
     Connection connection;
-    private String msj = "Error en dao usuario ";
+    private String msj = "Error en dao Autor ";
     private ResultSet rs;
     private PreparedStatement ps;
 
@@ -75,73 +75,64 @@ public class DAOAutor {
     }
 
     public Persona getNombreAutores(String id){
+        Connection connection1 = null;
+        PreparedStatement psGet = null;
+        ResultSet rsGet = null;
         try{
-            connection = conexion.getConnection();
-            ps = connection.prepareStatement("SELECT I.ID, I.Nombre, I.ApellidoPaterno, I.ApellidoMaterno FROM INFORMACIONPERSONAL AS I, AUTOR AS A WHERE I.ID = A.IDPersona and A.IDAutor = ?;");
-            ps.setString(1, id);
-            rs = ps.executeQuery();
+            connection1 = conexion.getConnection();
+            psGet = connection1.prepareStatement("select ID, Nombre, ApellidoPaterno, ApellidoMaterno from InformacionPersonal as i, Autor as a  where i.ID = a.IDPersona and IDAutor = ?");
+            psGet.setString(1, id);
+            rsGet = psGet.executeQuery();
             Persona persona;
-            if(rs.next()){
+            if(rsGet.next()){
                 persona = new Persona();
-                persona.setIDPersona(rs.getString(1));
-                persona.setNombre(rs.getString(2));
-                persona.setPaterno(rs.getString(3));
-                persona.setMaterno(rs.getString(4));
-                System.out.println(persona.toString());
+                persona.setIDPersona(rsGet.getString(1));
+                persona.setNombre(rsGet.getString(2));
+                persona.setPaterno(rsGet.getString(3));
+                persona.setMaterno(rsGet.getString(4));
                 return persona;
             }else{
                 return null;
             }
-        }catch(SQLException e){
-            System.out.println(msj + e.getMessage());
-            return null;
         }catch (Exception e){
             System.out.println(msj + e.getMessage());
             return null;
         }finally {
             try{
-                connection.close();
-            }catch (SQLException e){
-                System.out.println(msj + e.getMessage());
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
             }
         }
     }
 
     public JsonObject getNombreAutores(String nombre, String apellido){
+        PreparedStatement psGet = null;
+        ResultSet rsGet = null;
         try{
             connection = conexion.getConnection();
-            ps = connection.prepareStatement("select i.Nombre, i.ApellidoPaterno, i.ApellidoMaterno, a.IDAutor, i.FechaNacimiento, i.FechaDeceso, i.Biografia, a.nacionalidad from InformacionPersonal as i, Autor as a where i.Nombre = ? and i.ApellidoPaterno = ? and i.ID = a.IDPersona");
-            ps.setString(1, nombre);
-            ps.setString(2, apellido);
-            rs = ps.executeQuery();
+            psGet = connection.prepareStatement("select i.Nombre, i.ApellidoPaterno, i.ApellidoMaterno, a.IDAutor, i.FechaNacimiento, i.FechaDeceso, i.Biografia, a.nacionalidad from InformacionPersonal as i, Autor as a where i.Nombre = ? and i.ApellidoPaterno = ? and i.ID = a.IDPersona");
+            psGet.setString(1, nombre);
+            psGet.setString(2, apellido);
+            rsGet = psGet.executeQuery();
             JsonObject jsonObject;
-            if(rs.next()){
+            if(rsGet.next()){
                 jsonObject = new JsonObject();
-                jsonObject.addProperty("nombre", rs.getString(1));
-                jsonObject.addProperty("paterno", rs.getString(2));
-                jsonObject.addProperty("materno", rs.getString(3));
-                jsonObject.addProperty("IDAutor", rs.getString(4));
-                jsonObject.addProperty("nacimiento", rs.getString(5));
-                jsonObject.addProperty("deceso", rs.getString(6));
-                jsonObject.addProperty("biografia", rs.getString(7));
-                jsonObject.addProperty("nacionalidad", rs.getString(8));
-
+                jsonObject.addProperty("nombre", rsGet.getString(1));
+                jsonObject.addProperty("paterno", rsGet.getString(2));
+                jsonObject.addProperty("materno", rsGet.getString(3));
+                jsonObject.addProperty("IDAutor", rsGet.getString(4));
+                jsonObject.addProperty("nacimiento", rsGet.getString(5));
+                jsonObject.addProperty("deceso", rsGet.getString(6));
+                jsonObject.addProperty("biografia", rsGet.getString(7));
+                jsonObject.addProperty("nacionalidad", rsGet.getString(8));
                 return jsonObject;
             }else{
                 return null;
             }
-        }catch(SQLException e){
-            System.out.println(msj + e.getMessage());
-            return null;
         }catch (Exception e){
             System.out.println(msj + e.getMessage());
             return null;
-        }finally {
-            try{
-                connection.close();
-            }catch (SQLException e){
-                System.out.println(msj + e.getMessage());
-            }
         }
     }
 

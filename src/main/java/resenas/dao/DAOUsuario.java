@@ -144,6 +144,7 @@ public class DAOUsuario {
                 usuario.setCorreo(rs.getString(3));
                 usuario.setPassword(rs.getString(4));
                 usuario.setIDPersona(rs.getString(5));
+                usuario.setFoto(rs.getString(6));
                 return usuario;
             }else{
                 return null;
@@ -216,5 +217,103 @@ public class DAOUsuario {
             }
         }
     }
+
+    public ArrayList searchByUser(String usuario) {
+        ArrayList<Usuario> list = new ArrayList<>();
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select * from usuario where NombreUsuario like  ?");
+            ps.setString(1, "%" + usuario + "%");
+            rs = ps.executeQuery();
+            Usuario user;
+            while(rs.next()){
+                user = new Usuario();
+                user.setIDUsuario(rs.getString(1));
+                user.setUsuario(rs.getString(2));
+                user.setIDPersona(rs.getString(5));
+                list.add(user);
+            }
+            return list;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public boolean uploadPhoto(String idUsuario, String idImagen) {
+        PreparedStatement psU = null;
+        try{
+            connection = conexion.getConnection();
+            psU = connection.prepareStatement("update usuario set Foto = ?  where IDUsuario = ?");
+            psU.setString(1, idImagen);
+            psU.setString(2, idUsuario);
+            int res = psU.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public Usuario getByIDPersona(String p) {
+        PreparedStatement psID = null;
+        ResultSet rsID=null;
+        try{
+            connection = conexion.getConnection();
+            psID = connection.prepareStatement("select * from usuario where IDPersona = ?");
+            psID.setString(1, p);
+            rsID = psID.executeQuery();
+            Usuario usuario;
+            if (rsID.next()){
+                usuario = new Usuario();
+                usuario.setIDUsuario(rs.getString(1));
+                usuario.setUsuario(rs.getString(2));
+                usuario.setCorreo(rs.getString(3));
+                usuario.setPassword(rs.getString(4));
+                usuario.setIDPersona(rs.getString(5));
+                usuario.setFoto(rs.getString(6));
+                return usuario;
+            }else{
+                return null;
+            }
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+
+    public Usuario usuarioByID(String ID){
+        PreparedStatement psID = null;
+        ResultSet rsID = null;
+        try{
+            connection = conexion.getConnection();
+            psID = connection.prepareStatement("select * from usuario where IDUsuario = ?");
+            psID.setString(1, ID);
+            rsID = psID.executeQuery();
+            Usuario usuario;
+            if (rsID.next()){
+                usuario = new Usuario();
+                usuario.setIDUsuario(rsID.getString(1));
+                usuario.setUsuario(rsID.getString(2));
+                usuario.setCorreo(rsID.getString(3));
+                usuario.setPassword(rsID.getString(4));
+                usuario.setIDPersona(rsID.getString(5));
+                usuario.setFoto(rsID.getString(6));
+                return usuario;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
 
 }

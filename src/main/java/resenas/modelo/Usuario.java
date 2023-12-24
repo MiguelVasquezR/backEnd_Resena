@@ -6,10 +6,19 @@ public class Usuario {
     private String usuario;
     private String correo;
     private String password;
-
     private String IDPersona;
 
+    private String Foto;
+
     public Usuario(){
+    }
+
+    public String getFoto() {
+        return Foto;
+    }
+
+    public void setFoto(String foto) {
+        Foto = foto;
     }
 
     public Usuario(String IDUsuario, String nombreUsuario, String correo, String password, String IDPersona) {

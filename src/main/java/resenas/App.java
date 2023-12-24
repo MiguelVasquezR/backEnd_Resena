@@ -43,6 +43,8 @@ public class App {
         before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
         // ----------------------------------------------------- Personas
+
+
         get("/persona", (request, response) -> {
             String id = request.queryParams("id");
             Persona p = daoPersona.searchPersona(id);
@@ -85,6 +87,11 @@ public class App {
             return gson.toJson(usuario1);
         });
 
+        get("/usuarioUpload", (request, response) -> {
+            String IDPersona = request.queryParams("IDPersona");
+            return gson.toJson(daoUsuario.getByIDPersona(IDPersona));
+        });
+
         post("/usuario-personales", (request, response) -> {
             idPersona = randomID();
             Persona persona = gson.fromJson(request.body(), Persona.class);
@@ -110,6 +117,7 @@ public class App {
 
         post("/usuario-genero", (request, response) -> {
             String datos = request.body();
+            System.out.println(datos);
             if (!datos.equals("Sin genero")) {
                 String soloTexto = datos.replaceAll("[\\[\\]\"]", "");
                 String[] textosSeparados = soloTexto.split(",");
@@ -154,19 +162,30 @@ public class App {
             return gson.toJson(daoUsuario.getRedSocial(request.queryParams("IDUsuario")));
         });
 
+        get("/getUsuarios", (request, response) -> {
+            String usuario = request.queryParams("usuario");
+            return gson.toJson(daoUsuario.searchByUser(usuario));
+        });
+
+        put("/foto-usuario", (request, response) -> {
+            String IDUsuario = request.queryParams("IDUsuario");
+            String IDImagen = request.queryParams("Foto");
+            if (daoUsuario.uploadPhoto(IDUsuario, IDImagen)){
+                return gson.toJson(daoUsuario.usuarioByID(IDUsuario));
+            }else{
+                return "";
+            }
+        });
+
         // ----------------------------------------------------- Autores
         get("/nombre-autores", (request, response) -> {
             String id = request.queryParams("id");
-
-            //return gson.toJson(jsonObject);
-            return "";
+            return gson.toJson(daoAutor.getNombreAutores(id));
         });
 
         post("/autor-datos", (request, response) -> {
             String nombre = request.queryParams("nombre");
             String[] nombreDiv = nombre.split(" ");
-
-
             JsonObject jsonObject = daoAutor.getNombreAutores(nombreDiv[0], nombreDiv[1]);
             if ( jsonObject != null){
                 return jsonObject;
@@ -196,6 +215,7 @@ public class App {
             JsonObject jsonObject = new JsonObject();;
             if (daoLista.agregarLista(lista)){
                  jsonObject.addProperty("MSJ", "Guardado");
+                 jsonObject.addProperty("ID", lista.getID());
             }else{
                 jsonObject.addProperty("MSJ", "Error");
             }
@@ -220,8 +240,38 @@ public class App {
             return jsonObject;
         });
 
+        post("/agregar-libros", (request, response) -> {
+            String IDLista = request.queryParams("idlista");
+            String IDLibro = request.queryParams("idLibro");
+            String id = randomID();
+            LibroLista ll = new LibroLista(id, IDLista, IDLibro);
+            if (daoLista.agregarLibroLista(ll)){
+                System.out.println("Se ha agregado el libro");
+            }
+            return "";
+        });
+
+        delete("/eliminar-libros", (request, response) -> {
+            String IDLista = request.queryParams("idlista");
+            String IDLibro = request.queryParams("idLibro");
+            if (daoLista.eliminarLibroLista(IDLista, IDLibro)){
+                System.out.println("Libro ha sido eliminado");
+            }
+            return "";
+        });
+
+        get("/libros-lista", (request, response) -> {
+            String id = request.queryParams("IDLista");
+            return gson.toJson(daoLibro.getLibrosLista(id));
+        });
+
+        get("/get-lista-info", (request, response) -> {
+            String id = request.queryParams("id");
+            return gson.toJson(daoLista.searchLista(id));
+        });
+
         //---------------------------------------------------------------- libros
-        get("libros", (request, response) -> {
+        get("/libros", (request, response) -> {
             return gson.toJson(daoLibro.getLibros());
         });
 
@@ -233,8 +283,12 @@ public class App {
 
         get("/libros/autor", (request, response) -> {
             String idautor = request.queryParams("autor");
-            System.out.println(idautor);
             return gson.toJson(daoLibro.getLibrosByAutor(idautor));
+        });
+
+        get("/libros/id", (request, response) -> {
+            String idautor = request.queryParams("id");
+            return gson.toJson(daoLibro.getLibroByID(idautor));
         });
 
 

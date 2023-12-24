@@ -1,6 +1,7 @@
 package resenas.dao;
 
 import resenas.conexion.Conexion;
+import resenas.modelo.LibroLista;
 import resenas.modelo.Lista;
 
 import javax.imageio.ImageIO;
@@ -92,4 +93,95 @@ public class DAOLista {
     }
 
 
+    public boolean agregarLibroLista(LibroLista ll){
+        Connection connection1 = null;
+        PreparedStatement psGet = null;
+        try{
+            connection1 = conexion.getConnection();
+            psGet = connection1.prepareStatement("insert into LibroEnLista(IDLibroLista, IDLista, IDLibro) values (?, ?, ?)");
+            psGet.setString(1, ll.getIDLibroLista());
+            psGet.setString(2, ll.getIDLista());
+            psGet.setString(3, ll.getIDLibro());
+            int res = psGet.executeUpdate();
+            if (res  > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }finally {
+            try{
+                psGet.close();
+                connection1.close();
+            }catch (Exception e) {System.out.println(e.getMessage());}
+        }
+    }
+
+
+    public boolean eliminarLibroLista(String idLista, String idLibro) {
+        Connection connection1 = null;
+        PreparedStatement preparedStatement = null;
+        try{
+            connection1 = conexion.getConnection();
+            preparedStatement = connection1.prepareStatement("delete from LibroEnLista where IDLista = ? and IDLibro = ?");
+            preparedStatement.setString(1, idLista);
+            preparedStatement.setString(2, idLibro);
+            int res = preparedStatement.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }finally {
+            try{
+                preparedStatement.close();
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
+
+    public Lista searchLista(String id) {
+        Connection connection1 = null;
+        PreparedStatement ps1;
+        ResultSet rs1;
+
+        try{
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select * from lista where IDLIsta = ?");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
+            Lista lista;
+            if (rs1.next()){
+                lista = new Lista();
+                lista.setID(rs1.getString(1));
+                lista.setCantidad(rs1.getInt(2));
+                lista.setPrivacidad(rs1.getString(3));
+                lista.setNombre(rs1.getString(4));
+                lista.setDescripcion(rs1.getString(5));
+                lista.setIDUsuario(rs1.getString(6));
+                lista.setIDImagen(rs1.getString(7));
+                return lista;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
 }
