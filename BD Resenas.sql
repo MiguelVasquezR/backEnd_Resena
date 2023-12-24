@@ -14,13 +14,21 @@ CREATE TABLE InformacionPersonal (
     Biografia TEXT
 );
 
+CREATE TABLE IMAGENPERFIL(
+	ID VARCHAR(255) PRIMARY KEY,
+    NOMBRE VARCHAR(255),
+    IMAGEN LONGBLOB
+);
+
 CREATE TABLE Usuario (
     IDUsuario VARCHAR(255) PRIMARY KEY,
     NombreUsuario VARCHAR(100) NOT NULL,
     Correo VARCHAR(255) NOT NULL,
     Contrasena VARCHAR(100) NOT NULL,
     IDPersona VARCHAR(255) NOT NULL,
-    FOREIGN KEY (IDPersona) REFERENCES InformacionPersonal(ID)
+    FOREIGN KEY (IDPersona) REFERENCES InformacionPersonal(ID),
+    FOTO VARCHAR(255), 
+    FOREIGN KEY (FOTO) REFERENCES IMAGENPERFIL(ID)
 );
 
 CREATE TABLE Genero (
@@ -44,12 +52,6 @@ CREATE TABLE Autor (
     FOREIGN KEY (IDPersona) REFERENCES InformacionPersonal(ID)
 );
 
-CREATE TABLE Editorial (
-    IDEditorial VARCHAR(255) PRIMARY KEY,
-    Nombre VARCHAR(100) NOT NULL,
-    Pais VARCHAR(100) NOT NULL
-);
-
 CREATE TABLE Libro (
     IDLibro VARCHAR(255) PRIMARY KEY,
     Titulo VARCHAR(100) NOT NULL,
@@ -57,12 +59,11 @@ CREATE TABLE Libro (
     NumPag INT,
     FechaPublicacion DATE NOT NULL,
     Idioma VARCHAR(100) NOT NULL,
+    Editorial VARCHAR(255) NOT NULL,
     IDAutor VARCHAR(255) NOT NULL,
-    IDGenero VARCHAR(255) NOT NULL,
-    IDEditorial VARCHAR(255) NOT NULL,
+    IDGenero VARCHAR(255) NOT NULL,    
     FOREIGN KEY (IDAutor) REFERENCES Autor(IDAutor),
-    FOREIGN KEY (IDGenero) REFERENCES Genero(IDGenero),
-    FOREIGN KEY (IDEditorial) REFERENCES Editorial(IDEditorial)
+    FOREIGN KEY (IDGenero) REFERENCES Genero(IDGenero)
 );
 
 CREATE TABLE GenerosPublicados (
@@ -87,13 +88,13 @@ CREATE TABLE Resena (
 CREATE TABLE Lista (
     IDLista VARCHAR(255) PRIMARY KEY,
     CantidadLibros INT NOT NULL,
-    Privacidad VARCHAR(255) NOT NULL,
-    FechaCreacion DATE NOT NULL,
+    Privacidad VARCHAR(255) NOT NULL,    
     Nombre VARCHAR(255) NOT NULL,
-    Descripcion TEXT NOT NULL,
-    Foto BLOB NOT NULL,
+    Descripcion TEXT NOT NULL,    
     IDUsuario VARCHAR(255) NOT NULL,
-    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
+    FOTO VARCHAR(255), 
+    FOREIGN KEY (FOTO) REFERENCES IMAGENPERFIL(ID)
 );
 
 CREATE TABLE Comentario (
@@ -144,6 +145,15 @@ CREATE TABLE ParticipanteForo (
     IDUsuario VARCHAR(255) NOT NULL,
     IDFoto VARCHAR(255) NOT NULL,
     FechaAgregar DATE NOT NULL
+);
+
+
+
+CREATE TABLE REDSOCIAL(
+	IDRed VARCHAR(255) PRIMARY KEY, 
+    URL VARCHAR(255),
+    IDUsuario VARCHAR(255) NOT NULL,    
+    foreign key (IDUsuario) references Usuario(IDUsuario)
 );
 
 -- Insertar generos de novela, cuento, poesia, memoria, romance, teatro, ciencia ficcion y no ficcion
@@ -213,10 +223,25 @@ INSERT INTO Genero (IDGenero, Nombre, Descripcion) VALUES
 	En contraste, el periodista y escritor George Orwell, famoso por "1984" y "Rebelión en la Granja", contribuyó al género de no ficción con su obra "En el Camino a Wigan Pier". En este libro, Orwell utiliza la observación directa y la participación en la vida de los mineros para analizar las condiciones sociales y económicas de la época, combinando el reportaje con elementos ensayísticos.
 	Susan Sontag, por otro lado, exploró la crítica cultural y la interpretación de la realidad en ensayos como "Sobre la Fotografía". Sontag examina cómo la fotografía influye en nuestra percepción de la realidad, planteando preguntas filosóficas sobre la verdad y la representación visual.
 	En el siglo XXI, autores como Malcolm Gladwell han popularizado el formato del ensayo narrativo con obras como "Fueras de Serie", donde combina datos y anécdotas para explorar patrones socioculturales. Gladwell busca explicar fenómenos complejos de manera accesible y atractiva.'
+),
+	(
+	'ensayo', 
+    'Ensayo', 
+    'El ensayo es un género literario que se distingue por su carácter reflexivo y analítico sobre diversos temas. En contraste con formas de escritura más rígidas, el ensayo brinda a los autores una libertad considerable para expresar sus opiniones, ideas y puntos de vista de manera subjetiva. 
+	Este género literario no se limita a estructuras fijas y permite una variedad temática que abarca desde cuestiones filosóficas y sociales hasta experiencias personales. La flexibilidad en su estructura, combinada con la libertad de estilo, otorga a cada ensayo una marca distintiva y única, reflejando la voz y la perspectiva del autor. 
+    A través de la reflexión profunda y el análisis crítico, el ensayo invita al lector a explorar nuevas ideas y perspectivas, contribuyendo así al diálogo intelectual y a la comprensión más profunda de diversos temas. 
+    La claridad en la expresión y la coherencia en la argumentación son valores importantes que caracterizan a un buen ensayo, que busca comunicar de manera efectiva las reflexiones del autor.
+    '
 );
 
 -- Verificar que los datos se hayan insertado correctamente
+USE RESENAS;
+
 SELECT * FROM informacionpersonal;
 SELECT * FROM usuario;
 SELECT * FROM generosusuario;
 SELECT * FROM genero;
+SELECT * FROM Lista;
+SELECT * FROM Libro;
+
+select * from IMAGENPERFIL;

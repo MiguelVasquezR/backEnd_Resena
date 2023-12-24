@@ -1,8 +1,9 @@
 package resenas.dao;
 
+import com.google.gson.JsonObject;
 import resenas.conexion.Conexion;
 import resenas.modelo.Autor;
-import resenas.modelo.Usuario;
+import resenas.modelo.Persona;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +16,7 @@ public class DAOAutor {
 
     Conexion conexion = new Conexion();
     Connection connection;
-    private String msj = "Error en dao usuario ";
+    private String msj = "Error en dao Autor ";
     private ResultSet rs;
     private PreparedStatement ps;
 
@@ -73,33 +74,65 @@ public class DAOAutor {
         }
     }
 
-    public List getAutores(){
-        ArrayList<Autor> autors = new ArrayList<>();
+    public Persona getNombreAutores(String id){
+        Connection connection1 = null;
+        PreparedStatement psGet = null;
+        ResultSet rsGet = null;
         try{
-            connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from Autor");
-            rs = ps.executeQuery();
-            Autor autor;
-            while (rs.next()){
-                autor = new Autor();
-                autor.setIDAutor(rs.getString(1));
-                autor.setNacionalidad(rs.getString(2));
-                autor.setIDPersona(rs.getString(3));
-                autors.add(autor);
+            connection1 = conexion.getConnection();
+            psGet = connection1.prepareStatement("select ID, Nombre, ApellidoPaterno, ApellidoMaterno from InformacionPersonal as i, Autor as a  where i.ID = a.IDPersona and IDAutor = ?");
+            psGet.setString(1, id);
+            rsGet = psGet.executeQuery();
+            Persona persona;
+            if(rsGet.next()){
+                persona = new Persona();
+                persona.setIDPersona(rsGet.getString(1));
+                persona.setNombre(rsGet.getString(2));
+                persona.setPaterno(rsGet.getString(3));
+                persona.setMaterno(rsGet.getString(4));
+                return persona;
+            }else{
+                return null;
             }
-            return autors;
-        }catch(SQLException e){
-            System.out.println(msj + e.getMessage());
-            return null;
         }catch (Exception e){
             System.out.println(msj + e.getMessage());
             return null;
         }finally {
             try{
-                connection.close();
-            }catch (SQLException e){
-                System.out.println(msj + e.getMessage());
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
             }
+        }
+    }
+
+    public JsonObject getNombreAutores(String nombre, String apellido){
+        PreparedStatement psGet = null;
+        ResultSet rsGet = null;
+        try{
+            connection = conexion.getConnection();
+            psGet = connection.prepareStatement("select i.Nombre, i.ApellidoPaterno, i.ApellidoMaterno, a.IDAutor, i.FechaNacimiento, i.FechaDeceso, i.Biografia, a.nacionalidad from InformacionPersonal as i, Autor as a where i.Nombre = ? and i.ApellidoPaterno = ? and i.ID = a.IDPersona");
+            psGet.setString(1, nombre);
+            psGet.setString(2, apellido);
+            rsGet = psGet.executeQuery();
+            JsonObject jsonObject;
+            if(rsGet.next()){
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("nombre", rsGet.getString(1));
+                jsonObject.addProperty("paterno", rsGet.getString(2));
+                jsonObject.addProperty("materno", rsGet.getString(3));
+                jsonObject.addProperty("IDAutor", rsGet.getString(4));
+                jsonObject.addProperty("nacimiento", rsGet.getString(5));
+                jsonObject.addProperty("deceso", rsGet.getString(6));
+                jsonObject.addProperty("biografia", rsGet.getString(7));
+                jsonObject.addProperty("nacionalidad", rsGet.getString(8));
+                return jsonObject;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(msj + e.getMessage());
+            return null;
         }
     }
 
@@ -126,4 +159,28 @@ public class DAOAutor {
         }
     }
 
+    public String getID(String persona) {
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select IDAutor from autor where IDPersona = ?");
+            ps.setString(1, persona);
+            rs = ps.executeQuery();
+            if (rs.next()){
+                return rs.getString(1);
+            }else{
+                return "";
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return "";
+        }finally{
+            try{
+                connection.close();
+                ps.close();
+                rs.close();
+            }catch (SQLException e){
+                System.out.println(msj + e.getMessage());
+            }
+        }
+    }
 }

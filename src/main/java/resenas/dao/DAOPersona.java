@@ -124,5 +124,111 @@ public class DAOPersona {
         }
     }
 
+    public Persona searchPersona(String id){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select * from informacionpersonal as p where p.id = ?");
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+            Persona persona;
+            if (rs.next()){
+                persona = new Persona();
+                persona.setIDPersona(rs.getString(1));
+                persona.setNombre(rs.getString(2));
+                persona.setPaterno(rs.getString(3));
+                persona.setMaterno(rs.getString(4));
+                persona.setfNacimiento(rs.getDate(5));
+                persona.setfDeceso(rs.getDate(6));
+                persona.setBiografia(rs.getString(7));
+                return  persona;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try {
+                connection.close();
+                ps.close();
+                rs.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean updatePersona(Persona persona){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("update informacionpersonal as p set Nombre=?, ApellidoPaterno=?, ApellidoMaterno=?, Biografia=? where p.id = ?");
+            ps.setString(1, persona.getNombre());
+            ps.setString(2, persona.getPaterno());
+            ps.setString(3, persona.getMaterno());
+            ps.setString(4, persona.getBiografia());
+            ps.setString(5, persona.getIDPersona());
+            int res = ps.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }finally {
+            try{
+                connection.close();
+                ps.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean updatePersonaBiografia(String biografia, String IDPersona){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("update informacionpersonal as p set Biografia=? where p.id = ?");
+            ps.setString(1, biografia);
+            ps.setString(2, IDPersona);
+            int res = ps.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }finally {
+            try{
+                connection.close();
+                ps.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
+    public boolean uploadImage(String persona, String IDFoto){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("update InformacionPersonal set Foto = ? where ID = ?");
+            ps.setString(1, IDFoto);
+            ps.setString(2, persona);
+            int res = ps.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
 
 }
