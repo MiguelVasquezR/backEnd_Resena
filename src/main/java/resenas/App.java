@@ -18,6 +18,8 @@ public class App {
     static Gson gson = new Gson();
     static DAOPersona daoPersona = new DAOPersona();
     static DAOUsuario daoUsuario = new DAOUsuario();
+
+    static DAOForo daoForo = new DAOForo();
     static DAOAutor daoAutor = new DAOAutor();
     static DAOGeneroUsuario daoGeneroUsuario = new DAOGeneroUsuario();
     static DAOGeneros daoGeneros = new DAOGeneros();
@@ -26,6 +28,8 @@ public class App {
     static DAOResena daoResena = new DAOResena();
     static String idPersona;
     static String idUsuario;
+
+    static String idForo;
 
     public static void main(String[] args) {
 
@@ -173,6 +177,22 @@ public class App {
             }else {
                 return "";
             }
+        });
+
+
+        post("/foro-crear", (request, response) -> {
+            String datos = request.body();
+            Foro foro = gson.fromJson(datos, Foro.class);
+            idForo = randomID();
+            foro.setIDForo(idForo);
+            if (daoForo.createForo(foro)) {
+                System.out.println("Se guardo el foro");
+            }
+            return "";
+        });
+
+        get("/foros", (request, response) -> {
+            return gson.toJson(daoForo.getForos());
         });
 
 
