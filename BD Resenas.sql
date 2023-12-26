@@ -20,6 +20,12 @@ CREATE TABLE IMAGENPERFIL(
     IMAGEN LONGBLOB
 );
 
+CREATE TABLE IMAGEAUTOR(
+	ID VARCHAR(255) PRIMARY KEY,
+    NOMBRE VARCHAR(255),
+    IMAGEN LONGBLOB
+);
+
 CREATE TABLE Usuario (
     IDUsuario VARCHAR(255) PRIMARY KEY,
     NombreUsuario VARCHAR(100) NOT NULL,
@@ -74,15 +80,18 @@ CREATE TABLE GenerosPublicados (
     FOREIGN KEY (IDAutor) REFERENCES Autor(IDAutor)
 );
 
-CREATE TABLE Resena (
-    IDResena VARCHAR(255) PRIMARY KEY,
+CREATE TABLE Resena(
+	IDResena VARCHAR(255) PRIMARY KEY,
     FechaPublicada DATE NOT NULL,
     Puntuacion INT NOT NULL,
     Contenido TEXT NOT NULL,
-    IDLibro VARCHAR(255) NOT NULL,
-    IDUsuario VARCHAR(255) NOT NULL,
-    FOREIGN KEY (IDLibro) REFERENCES Libro(IDLibro),
-    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
+    NombreLibro VARCHAR(255) NOT NULL,
+    NombreAutor VARCHAR(255) NOT NULL,
+    Idioma VARCHAR(255) NOT NULL,
+    Editorial VARCHAR(255) NOT NULL,
+    FotoID VARCHAR(255) NOT NULL,
+	IDUsuario VARCHAR(255) NOT NULL,
+	FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
 );
 
 CREATE TABLE Lista (
@@ -185,8 +194,8 @@ INSERT INTO Genero (IDGenero, Nombre, Descripcion) VALUES
 	La poesía contemporánea también ha experimentado con nuevas formas y enfoques, incorporando voces diversas y desafiando las convenciones establecidas. La lingüística computacional también ha permitido analizar patrones y tendencias en la poesía, revelando conexiones y variaciones a lo largo del tiempo.'
 ),
 	(
-    'memoria', 
-    'Memoria', 
+    'memorias', 
+    'Memorias', 
     'En la literatura de memoria, los autores exploran eventos y momentos significativos de sus propias vidas, compartiendo sus pensamientos, emociones y perspectivas. Estas obras a menudo abarcan desde la infancia hasta la adultez, y pueden centrarse en temas como el crecimiento personal, la identidad, las relaciones familiares, las experiencias culturales y sociales, entre otros.
 	Algunos ejemplos clásicos de literatura de memoria incluyen "Las Confesiones" de San Agustín, que es considerada una de las primeras autobiografías, y "Memorias de Adriano" de Marguerite Yourcenar, que adopta la voz del emperador romano Adriano.
 	En el ámbito de la literatura hispana, podríamos mencionar "Vivir para contarla" de Gabriel García Márquez, donde el autor colombiano comparte sus experiencias de infancia y juventud, o "Palinuro de México" de Fernando del Paso, una obra que mezcla la autobiografía con elementos surrealistas.
@@ -235,13 +244,22 @@ INSERT INTO Genero (IDGenero, Nombre, Descripcion) VALUES
 );
 
 -- Verificar que los datos se hayan insertado correctamente
-USE RESENAS;
-
-SELECT * FROM informacionpersonal;
-SELECT * FROM usuario;
-SELECT * FROM generosusuario;
-SELECT * FROM genero;
-SELECT * FROM Lista;
-SELECT * FROM Libro;
-
+use resenas;
+select * from genero;
+select * from InformacionPersonal;
+select * from USUARIO;
+select * from AUTOR;
 select * from IMAGENPERFIL;
+select * from lista;
+select * from LibroEnLista;
+select * from libro;
+
+select * from InformacionPersonal as i, Autor as a  where i.ID = a.IDPersona and IDAutor = 'cdfea0g1-s1a9-3a5c-b8a6-ae12eda90';
+
+select * from libro, libroenlista, lista;
+
+select * from libro;
+select * from lista;
+select * from libroenlista;
+
+select * from libroenlista where IDLista = '2efbb1cc-87b7-4732-b0a5-8b947afd4814';
