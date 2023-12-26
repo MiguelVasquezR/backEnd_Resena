@@ -173,4 +173,44 @@ public class DAOLibro {
             }
         }
     }
+
+    public Libro getOneLibroByID(String idLibro){
+        Connection connection1 = null;
+        PreparedStatement ps1 = null;
+        ResultSet rs1 = null;
+        try{
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select * from libro where IDLibro = ?;");
+            ps1.setString(1, idLibro);
+            rs1 = ps1.executeQuery();
+            Libro libro;
+            if(rs1.next()){
+                libro = new Libro();
+                libro.setIDLibro(rs.getString(1));
+                libro.setTitulo(rs.getString(2));
+                libro.setFoto(rs.getString(3));
+                libro.setNumPag(rs.getInt(4));
+                libro.setFechaPublicacion(rs.getDate(5));
+                libro.setIdioma(rs.getString(6));
+                libro.setEditorial(rs.getString(7));
+                libro.setIDAutor(rs.getString(8));
+                libro.setIDGenero(rs.getString(9));
+                return  libro;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
+
 }
