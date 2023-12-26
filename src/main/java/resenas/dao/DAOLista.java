@@ -1,5 +1,6 @@
 package resenas.dao;
 
+import com.google.gson.JsonObject;
 import resenas.conexion.Conexion;
 import resenas.modelo.LibroLista;
 import resenas.modelo.Lista;
@@ -155,7 +156,7 @@ public class DAOLista {
 
         try{
             connection1 = conexion.getConnection();
-            ps1 = connection1.prepareStatement("select * from lista where IDLIsta = ?");
+            ps1 = connection1.prepareStatement("select * from lista where IDLista = ?");
             ps1.setString(1, id);
             rs1 = ps1.executeQuery();
             Lista lista;
@@ -184,4 +185,100 @@ public class DAOLista {
         }
 
     }
+
+    public ArrayList getOptionsBook(String id) {
+        ArrayList<JsonObject> list = new ArrayList();
+
+        Connection connection1 = null;
+        PreparedStatement ps1;
+        ResultSet rs1;
+        try{
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("SELECT l.IDLibro, l.Titulo,l.Foto,l.NumPag,i.Nombre,i.ApellidoPaterno,i.ApellidoMaterno FROM libro AS l JOIN libroenlista AS lel ON l.IDLibro = lel.IDLibro " +
+                    "JOIN autor AS a ON l.IDAutor = a.IDAutor \n JOIN informacionpersonal AS i ON a.IDPersona = i.ID WHERE a.IDAutor = l.IDAutor\n" +
+                    "AND lel.IDLista = ?");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
+            JsonObject jsonObject;
+            while (rs1.next()){
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("IDLibro", rs1.getString(1));
+                jsonObject.addProperty("Titulo", rs1.getString(2));
+                jsonObject.addProperty("Foto", rs1.getString(3));
+                jsonObject.addProperty("NumPag", rs1.getString(4));
+                jsonObject.addProperty("Nombre", rs1.getString(5));
+                jsonObject.addProperty("Paterno", rs1.getString(6));
+                jsonObject.addProperty("Materno", rs1.getString(7));
+                list.add(jsonObject);
+            }
+            return list;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean actCantidad(int cantidad, String id){
+        Connection connection1 = null;
+        PreparedStatement ps1;
+        ResultSet rs1;
+        System.out.println(cantidad);
+        try {
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("update lista set cantidadLibros = ? where IDLista = ?");
+            ps1.setInt(1, cantidad);
+            ps1.setString(2, id);
+            int res = ps1.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return true;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
+
+    public int getCantidad(String id) {
+        Connection connection1 = null;
+        PreparedStatement ps1;
+        ResultSet rs1;
+        try {
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select count(IDLista) as cantidad from libroenlista where IDLista = ?;");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
+            if (rs1.next()){
+                return rs1.getInt("cantidad");
+            }else{
+                return 0;
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return 0;
+        } finally {
+            try {
+                connection1.close();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
 }

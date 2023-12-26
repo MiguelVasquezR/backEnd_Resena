@@ -81,7 +81,7 @@ public class App {
         });
 
         // ----------------------------------------------------- Usuarios
-        post("/usuario", (request, response) -> {
+            post("/usuario", (request, response) -> {
             Usuario usuario = gson.fromJson(request.body(), Usuario.class);
             Usuario usuario1 = daoUsuario.searchUser(usuario.getUsuario());
             return gson.toJson(usuario1);
@@ -246,7 +246,9 @@ public class App {
             String id = randomID();
             LibroLista ll = new LibroLista(id, IDLista, IDLibro);
             if (daoLista.agregarLibroLista(ll)){
-                System.out.println("Se ha agregado el libro");
+                int cantidad = daoLista.getCantidad(IDLista);
+                System.out.println(cantidad);
+                daoLista.actCantidad(cantidad + 1, IDLista);
             }
             return "";
         });
@@ -254,8 +256,9 @@ public class App {
         delete("/eliminar-libros", (request, response) -> {
             String IDLista = request.queryParams("idlista");
             String IDLibro = request.queryParams("idLibro");
-            if (daoLista.eliminarLibroLista(IDLista, IDLibro)){
-                System.out.println("Libro ha sido eliminado");
+            if (daoLista.eliminarLibroLista(IDLista, IDLibro)) {
+                int cantidad = daoLista.getCantidad(IDLista);
+                daoLista.actCantidad(cantidad - 1, IDLista);
             }
             return "";
         });
@@ -291,6 +294,15 @@ public class App {
             return gson.toJson(daoLibro.getLibroByID(idautor));
         });
 
+        get("/libros/idLibro", (request, response) -> {
+            String idautor = request.queryParams("id");
+            return gson.toJson(daoLibro.getOneLibroByID(idautor));
+        });
+
+        get("/optionBook", (request, response) -> {
+            String id = request.queryParams("id");
+            return gson.toJson(daoLista.getOptionsBook(id));
+        });
 
         //---------------------------------------------------------------------- Resenas
 
