@@ -212,4 +212,23 @@ public class DAOPersona {
     }
 
 
+    public boolean uploadImage(String persona, String IDFoto){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("update InformacionPersonal set Foto = ? where ID = ?");
+            ps.setString(1, IDFoto);
+            ps.setString(2, persona);
+            int res = ps.executeUpdate();
+            if (res>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+
 }

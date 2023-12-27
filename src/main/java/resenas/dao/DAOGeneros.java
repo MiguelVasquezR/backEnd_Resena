@@ -19,33 +19,27 @@ public class DAOGeneros {
     private PreparedStatement ps;
 
     public Genero getGenero(String nombre){
+        PreparedStatement psGet = null;
+        ResultSet rsGet = null;
         try{
             connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from genero where Nombre = ?");
-            ps.setString(1, nombre);
-            rs = ps.executeQuery();
+            psGet = connection.prepareStatement("select * from genero where Nombre = ?");
+            psGet.setString(1, nombre);
+            rsGet = psGet.executeQuery();
             Genero genero;
-            if (rs.next()){
+            if (rsGet.next()){
                 genero = new Genero();
-                genero.setIDGenero(rs.getString(1));
-                genero.setNombre(rs.getString(2));
-                genero.setDescripcion(rs.getString(3));
+                genero.setIDGenero(rsGet.getString(1));
+                genero.setNombre(rsGet.getString(2));
+                genero.setDescripcion(rsGet.getString(3));
                 return genero;
             }else{
                 return null;
             }
-        }catch(SQLException e){
-            System.out.println(msj + e.getMessage());
-            return null;
         }catch (Exception e){
+            System.out.println("Segundo catch");
             System.out.println(msj + e.getMessage());
             return null;
-        }finally {
-            try{
-                connection.close();
-            }catch (SQLException e){
-                System.out.println(msj + e.getMessage());
-            }
         }
     }
 
@@ -71,12 +65,6 @@ public class DAOGeneros {
         }catch (Exception e){
             System.out.println(msj + e.getMessage());
             return null;
-        }finally {
-            try{
-                connection.close();
-            }catch (SQLException e){
-                System.out.println(msj + e.getMessage());
-            }
         }
     }
 

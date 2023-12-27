@@ -11,7 +11,7 @@ public class Persona {
     private Date fDeceso;
     private String biografia;
 
-    public Persona(){        
+    public Persona(){
     }
 
     public Persona(String IDPersona, String nombre, String paterno, String materno, Date fNacimiento, Date fDeceso, String biografia) {
