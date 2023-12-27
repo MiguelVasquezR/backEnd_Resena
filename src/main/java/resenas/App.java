@@ -20,6 +20,9 @@ public class App {
     static DAOUsuario daoUsuario = new DAOUsuario();
 
     static DAOForo daoForo = new DAOForo();
+
+    static DAOPublicacion daoPublicacion = new DAOPublicacion();
+
     static DAOAutor daoAutor = new DAOAutor();
     static DAOGeneroUsuario daoGeneroUsuario = new DAOGeneroUsuario();
     static DAOGeneros daoGeneros = new DAOGeneros();
@@ -177,6 +180,16 @@ public class App {
             }else {
                 return "";
             }
+        });
+
+
+        post("/crear-publicacion", (request, response) -> {
+            String datos = request.body();
+            Publicacion publicacion = gson.fromJson(datos, Publicacion.class);
+            if (daoPublicacion.createPublicacion(publicacion)) {
+                System.out.println("Se guardo la publicacion");
+            }
+            return "";
         });
 
 
