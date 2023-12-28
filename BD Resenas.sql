@@ -156,6 +156,14 @@ CREATE TABLE ParticipanteForo (
     FechaAgregar DATE NOT NULL
 );
 
+CREATE TABLE `publicacion` (
+  Comentario varchar(255) DEFAULT NULL,
+  ReaccionLike int(11) DEFAULT NULL,
+  ReaccionDislike int(11) DEFAULT NULL,
+  IDForo varchar(255) DEFAULT NULL,
+  IDUsuario varchar(255) DEFAULT NULL
+);
+
 
 
 CREATE TABLE REDSOCIAL(
@@ -242,24 +250,3 @@ INSERT INTO Genero (IDGenero, Nombre, Descripcion) VALUES
     La claridad en la expresión y la coherencia en la argumentación son valores importantes que caracterizan a un buen ensayo, que busca comunicar de manera efectiva las reflexiones del autor.
     '
 );
-
--- Verificar que los datos se hayan insertado correctamente
-use resenas;
-select * from genero;
-select * from InformacionPersonal;
-select * from USUARIO;
-select * from AUTOR;
-select * from IMAGENPERFIL;
-select * from lista;
-select * from LibroEnLista;
-select * from libro;
-
-select * from InformacionPersonal as i, Autor as a  where i.ID = a.IDPersona and IDAutor = 'cdfea0g1-s1a9-3a5c-b8a6-ae12eda90';
-
-select * from libro, libroenlista, lista;
-
-select * from libro;
-select * from lista;
-select * from libroenlista;
-
-select * from libroenlista where IDLista = '2efbb1cc-87b7-4732-b0a5-8b947afd4814';
