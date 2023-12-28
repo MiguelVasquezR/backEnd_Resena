@@ -45,18 +45,20 @@ public class DAOForo {
 
     public ArrayList getForos(){
         Connection connection1 = null;
+        PreparedStatement ps1;
+        ResultSet rs1;
         ArrayList<Foro> foros = new ArrayList<>();
         try{
             connection1 = conexion.getConnection();
-            ps = connection1.prepareStatement("select * from foro");
-            rs = ps.executeQuery();
+            ps1 = connection1.prepareStatement("select * from foro");
+            rs1 = ps1.executeQuery();
             Foro foro;
-            while (rs.next()){
+            while (rs1.next()){
                 foro = new Foro();
-                foro.setIDForo(rs.getString(1));
-                foro.setOpcion(rs.getString(2));
-                foro.setDescripcion(rs.getString(3));
-                foro.setNombre(rs.getString(5));
+                foro.setIDForo(rs1.getString(1));
+                foro.setOpcion(rs1.getString(2));
+                foro.setDescripcion(rs1.getString(3));
+                foro.setNombre(rs1.getString(5));
                 foros.add(foro);
             }
             return foros;

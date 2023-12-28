@@ -18,7 +18,7 @@ public class App {
     static Gson gson = new Gson();
     static DAOPersona daoPersona = new DAOPersona();
     static DAOUsuario daoUsuario = new DAOUsuario();
-
+    static DAOSeguidor daoSeguidor = new DAOSeguidor();
     static DAOForo daoForo = new DAOForo();
 
     static DAOPublicacion daoPublicacion = new DAOPublicacion();
@@ -86,6 +86,24 @@ public class App {
             System.out.println(jsonObject);
             return jsonObject;
         });
+
+        get("/get-biografia", (request, response) -> {
+            String id = request.queryParams("IDPersona");
+            JsonObject jsonObject = new JsonObject();
+            String bio = daoPersona.getBiografy(id);
+            String msj = "";
+            if (bio != null){
+                if (bio.length() > 0){
+                    msj = bio;
+                }else{
+                    msj = "nada";
+                }
+            }
+            jsonObject.addProperty("bio", msj);
+            return jsonObject;
+        });
+
+
 
         // ----------------------------------------------------- Usuarios
             post("/usuario", (request, response) -> {
@@ -187,6 +205,15 @@ public class App {
             }else{
                 return "";
             }
+        });
+
+        post("/get-perfil-user", (request, response) -> {
+            String id = request.queryParams("IDuser");
+            return daoUsuario.getPerfilUser(id);
+        });
+
+        get("/getRedes", (request, response) -> {
+            return gson.toJson(daoUsuario.getRedSocial(request.queryParams("id")));
         });
 
         // ----------------------------------------------------- Autores
@@ -371,6 +398,81 @@ public class App {
             String id = request.queryParams("IDUsuario");
             return gson.toJson(daoResena.getResenas(id));
         });
+
+        //------------------------------------------------------------- Follow
+
+        post("/follow", (request, response) -> {
+            Seguidor seguidor = gson.fromJson(request.body(), Seguidor.class);
+            seguidor.setIDSeguidor(randomID());
+            String msj;
+            if (daoSeguidor.follow(seguidor)){
+                msj = "Nuevo Seguidor";
+            }else{
+                msj = "No se puedo agregar" ;
+            }
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("MSJ", msj);
+            return jsonObject;
+        });
+
+        get("/count1", (request, response) -> {
+            String id = request.queryParams("id");
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("Seguidores", daoSeguidor.countFollow1(id));
+            jsonObject.addProperty("Seguidos", daoSeguidor.countFollow2(id));
+            return jsonObject;
+        });
+
+        get("/seguidores", (request, response) -> {
+            String id = request.queryParams("id");
+            return gson.toJson(daoSeguidor.seguidores(id));
+        });
+
+        get("/seguidos", (request, response) -> {
+            String id = request.queryParams("id");
+            return gson.toJson(daoSeguidor.seguidos(id));
+        });
+
+        delete("/delete-follow", (request, response) -> {
+            String origen = request.queryParams("IDOrigen");
+            String IDDes = request.queryParams("IDDes");
+            JsonObject jsonObject = new JsonObject();
+            String msj = "";
+            if (daoSeguidor.unFollow(origen, IDDes)){
+                msj = "UnFollow";
+            }else{
+                msj = "Not UnFollow";
+            }
+            jsonObject.addProperty("msj", msj);
+            return jsonObject;
+        });
+
+        delete("/delete-follows", (request, response) -> {
+            String origen = request.queryParams("IDOrigen");
+            String IDDes = request.queryParams("IDDes");
+            JsonObject jsonObject = new JsonObject();
+            String msj = "";
+            if (daoSeguidor.unFollows(origen, IDDes)){
+                msj = "UnFollow";
+            }else{
+                msj = "Not UnFollow";
+            }
+            jsonObject.addProperty("msj", msj);
+            return jsonObject;
+        });
+
+        get("/getFollow", (request, response) -> {
+           String id = request.queryParams("id");
+           return gson.toJson(daoSeguidor.getFollow(id));
+        });
+
+
+        //_------------------------------------------------------------------- Publicacion
+        get("/resenas-follow", (request, response) -> {
+           String idO = request.queryParams("id");
+            return  gson.toJson(daoResena.getResenasFollows(idO));
+        });
+
 
     }
 

@@ -1,5 +1,6 @@
 package resenas.dao;
 
+import com.google.gson.JsonObject;
 import resenas.conexion.Conexion;
 import resenas.modelo.RedSocial;
 import resenas.modelo.Usuario;
@@ -251,24 +252,35 @@ public class DAOUsuario {
     }
 
     public ArrayList searchByUser(String usuario) {
-        ArrayList<Usuario> list = new ArrayList<>();
+        ArrayList<JsonObject> list = new ArrayList<>();
+        Connection connection1 = null;
         try{
-            connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from usuario where NombreUsuario like  ?");
+            connection1 = conexion.getConnection();
+            ps = connection1.prepareStatement("SELECT i.Nombre, i.ApellidoPaterno, i.ApellidoMaterno, u.NombreUsuario, u.IDUsuario, u.Foto FROM informacionpersonal AS i JOIN usuario AS u ON i.ID = u.IDPersona\n" +
+                                                    "WHERE u.IDPersona IN (SELECT IDPersona FROM usuario WHERE NombreUsuario LIKE ?);");
             ps.setString(1, "%" + usuario + "%");
             rs = ps.executeQuery();
-            Usuario user;
+            JsonObject jsonObject;
             while(rs.next()){
-                user = new Usuario();
-                user.setIDUsuario(rs.getString(1));
-                user.setUsuario(rs.getString(2));
-                user.setIDPersona(rs.getString(5));
-                list.add(user);
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("nombre", rs.getString(1));
+                jsonObject.addProperty("paterno", rs.getString(2));
+                jsonObject.addProperty("materno", rs.getString(3));
+                jsonObject.addProperty("usuario", rs.getString(4));
+                jsonObject.addProperty("IDUsuario", rs.getString(5));
+                jsonObject.addProperty("IDFoto", rs.getString(6));
+                list.add(jsonObject);
             }
             return list;
         }catch (Exception e){
             System.out.println(e.getMessage());
             return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -348,4 +360,35 @@ public class DAOUsuario {
     }
 
 
+    public JsonObject getPerfilUser(String id) {
+        Connection connection1 = null;
+        PreparedStatement ps1;
+        ResultSet rs1;
+        JsonObject jsonObject = new JsonObject();
+        try{
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select nombre, apellidopaterno, apellidomaterno, nombreusuario, foto from informacionpersonal, usuario where idusuario = ? and ID = IDPersona;");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
+            if (rs1.next()){
+                jsonObject.addProperty("nombre", rs1.getString(1));
+                jsonObject.addProperty("paterno", rs1.getString(2));
+                jsonObject.addProperty("materno", rs1.getString(3));
+                jsonObject.addProperty("usuario", rs1.getString(4));
+                jsonObject.addProperty("foto", rs1.getString(5));
+                return jsonObject;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 }

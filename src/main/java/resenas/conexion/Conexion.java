@@ -8,7 +8,7 @@ public class Conexion {
 
     private Connection connection;
     private String user = "root";
-    private String password = "ad";
+    private String password = "FormulaUno";
     private String ulr = "jdbc:mysql://localhost:3306/resenas";
 
     public Connection getConnection(){
