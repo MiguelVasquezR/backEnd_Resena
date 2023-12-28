@@ -91,7 +91,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>backEnd_Resena.resenas.App</mainClass>
+              <mainClass>resenas.App</mainClass>
             </manifest>
           </archive>
         </configuration>
