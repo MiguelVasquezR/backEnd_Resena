@@ -7,14 +7,16 @@ import java.sql.SQLException;
 public class Conexion {
 
     private Connection connection;
-    private String user = "root";
-    private String password = "FormulaUno";
-    private String ulr = "jdbc:mysql://localhost:3306/resenas";
+
+    String url ="jdbc:mysql://resenas.mysql.database.azure.com:3306/resenas?useSSL=true&requireSSL=false";
+    String user = "daniel@resenas";
+    String password = "pepito*89";
 
     public Connection getConnection(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection(ulr, user, password);
+            Connection connection1 = DriverManager.getConnection(url, user, password);
+            return connection1;
         }catch (SQLException e){
             System.out.println(e.getMessage());
             return null;

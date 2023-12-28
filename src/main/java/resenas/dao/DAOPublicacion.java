@@ -1,5 +1,6 @@
 package resenas.dao;
 
+import com.google.gson.JsonObject;
 import resenas.conexion.Conexion;
 import resenas.modelo.Foro;
 import resenas.modelo.Publicacion;
@@ -71,4 +72,40 @@ public class DAOPublicacion {
             }catch (Exception e){e.getMessage();}
         }
     }
+
+    public ArrayList getPub(String id){
+        ArrayList<JsonObject> list = new ArrayList<>();
+        Connection connection1=null;
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try{
+            connection1 = conexion.getConnection();
+            preparedStatement = connection1.prepareStatement("SELECT u.nombreUsuario, ip.nombre, ip.apellidopaterno, p.comentario, u.Foto FROM usuario AS u INNER JOIN informacionpersonal AS ip INNER JOIN publicacion as p ON u.IDPersona = ip.ID where p.IDUsuario = u.IDUsuario and p.IDForo = ?");
+            preparedStatement.setString(1, id);
+            resultSet = preparedStatement.executeQuery();
+            JsonObject jsonObject;
+            while (resultSet.next()){
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("usuario", resultSet.getString(1));
+                jsonObject.addProperty("nombre", resultSet.getString(2));
+                jsonObject.addProperty("paterno", resultSet.getString(3));
+                jsonObject.addProperty("comentario", resultSet.getString(4));
+                jsonObject.addProperty("foto", resultSet.getString(5));
+                list.add(jsonObject);
+            }
+            return list;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
+
 }

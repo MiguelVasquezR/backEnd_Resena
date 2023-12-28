@@ -17,11 +17,13 @@ public class DAOForo {
     public boolean createForo(Foro foro){
         try{
             connection = conexion.getConnection();
-            ps = connection.prepareStatement("insert into foro (IDForo, Opcion, Descripcion, Nombre) values (?,?,?,?)");
+            ps = connection.prepareStatement("insert into foro (IDForo, Opcion, Descripcion, Nombre, IDFoto, IDUsuario) values (?, ?, ?, ?, ?, ?)");
             ps.setString(1, foro.getIDForo());
             ps.setString(2, foro.getOpcion());
             ps.setString(3, foro.getDescripcion());
             ps.setString(4, foro.getNombre());
+            ps.setString(5, foro.getFoto());
+            ps.setString(6, foro.getIDUsuario());
             int res = ps.executeUpdate();
             if (res>0){
                 return true;
@@ -50,15 +52,15 @@ public class DAOForo {
         ArrayList<Foro> foros = new ArrayList<>();
         try{
             connection1 = conexion.getConnection();
-            ps1 = connection1.prepareStatement("select * from foro");
+            ps1 = connection1.prepareStatement("select IDForo, Descripcion, Nombre, IDFoto from foro;");
             rs1 = ps1.executeQuery();
             Foro foro;
             while (rs1.next()){
                 foro = new Foro();
                 foro.setIDForo(rs1.getString(1));
-                foro.setOpcion(rs1.getString(2));
-                foro.setDescripcion(rs1.getString(3));
-                foro.setNombre(rs1.getString(5));
+                foro.setDescripcion(rs1.getString(2));
+                foro.setNombre(rs1.getString(3));
+                foro.setFoto(rs1.getString(4));
                 foros.add(foro);
             }
             return foros;
