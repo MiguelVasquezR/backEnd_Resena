@@ -9,6 +9,9 @@ public class Publicacion {
     private int ReaccionLike;
     private int ReaccionDislike;
 
+    public Publicacion(){
+    }
+
     public Publicacion(String IDUsuario, String IDForo, String Comentario, int ReaccionLike, int ReaccionDislike) {
         this.IDUsuario = IDUsuario;
         this.IDForo = IDForo;
