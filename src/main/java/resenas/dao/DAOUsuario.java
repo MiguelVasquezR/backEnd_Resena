@@ -132,20 +132,24 @@ public class DAOUsuario {
     }
 
     public Usuario searchUserById(String id){
+        Connection connection1 = null;
+        PreparedStatement ps1 = null;
+        ResultSet rs1 = null;
+
         try{
-            connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from usuario as u where u.IDUsuario = ?");
-            ps.setString(1, id);
-            rs = ps.executeQuery();
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select * from usuario as u where u.IDUsuario = ?");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
             Usuario usuario;
-            if (rs.next()){
+            if (rs1.next()){
                 usuario = new Usuario();
-                usuario.setIDUsuario(rs.getString(1));
-                usuario.setUsuario(rs.getString(2));
-                usuario.setCorreo(rs.getString(3));
-                usuario.setPassword(rs.getString(4));
-                usuario.setIDPersona(rs.getString(5));
-                usuario.setFoto(rs.getString(6));
+                usuario.setIDUsuario(rs1.getString(1));
+                usuario.setUsuario(rs1.getString(2));
+                usuario.setCorreo(rs1.getString(3));
+                usuario.setPassword(rs1.getString(4));
+                usuario.setIDPersona(rs1.getString(5));
+                usuario.setFoto(rs1.getString(6));
                 return usuario;
             }else{
                 return null;
@@ -155,8 +159,7 @@ public class DAOUsuario {
             return null;
         }finally {
             try{
-                connection.close();
-                ps.close();
+                connection1.close();
             }catch (Exception e){
                 System.out.println(e.getMessage());
             }
