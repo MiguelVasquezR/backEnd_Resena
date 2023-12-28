@@ -130,6 +130,38 @@ public class DAOUsuario {
         }
     }
 
+    public Usuario searchUserById(String id){
+        try{
+            connection = conexion.getConnection();
+            ps = connection.prepareStatement("select * from usuario as u where u.IDUsuario = ?");
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+            Usuario usuario;
+            if (rs.next()){
+                usuario = new Usuario();
+                usuario.setIDUsuario(rs.getString(1));
+                usuario.setUsuario(rs.getString(2));
+                usuario.setCorreo(rs.getString(3));
+                usuario.setPassword(rs.getString(4));
+                usuario.setIDPersona(rs.getString(5));
+                usuario.setFoto(rs.getString(6));
+                return usuario;
+            }else{
+                return null;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection.close();
+                ps.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     public Usuario searchUser(String nomUsuario){
         try{
             connection = conexion.getConnection();

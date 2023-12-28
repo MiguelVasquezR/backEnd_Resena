@@ -99,6 +99,11 @@ public class App {
             return gson.toJson(daoUsuario.getByIDPersona(IDPersona));
         });
 
+        get("/usuarioById", (request, response) -> {
+            String IDUsuario = request.queryParams("IDUsuario");
+            return gson.toJson(daoUsuario.searchUserById(IDUsuario));
+        });
+
         post("/usuario-personales", (request, response) -> {
             idPersona = randomID();
             Persona persona = gson.fromJson(request.body(), Persona.class);
@@ -209,6 +214,10 @@ public class App {
                 System.out.println("Se guardo la publicacion");
             }
             return "";
+        });
+
+        get("/publicaciones", (request, response) -> {
+            return gson.toJson(daoPublicacion.getPublicaciones());
         });
 
 
