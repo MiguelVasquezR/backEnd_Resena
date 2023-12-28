@@ -1,5 +1,6 @@
 package resenas.dao;
 
+import com.google.gson.JsonObject;
 import resenas.conexion.Conexion;
 import resenas.modelo.Resena;
 
@@ -74,4 +75,41 @@ public class DAOResena {
     }
 
 
+    public ArrayList getResenasFollows(String idO) {
+        ArrayList<JsonObject> list = new ArrayList<>();
+        Connection connection1 = null;
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try{
+            connection1 = conexion.getConnection();
+            preparedStatement = connection1.prepareStatement("SELECT Puntuacion, contenido, nombreLibro, nombreAutor, Idioma, editorial, fotoID, usuario.IDUsuario FROM Resena JOIN usuario ON Resena.IDUsuario = usuario.IDUsuario JOIN informacionPersonal AS i ON i.ID = usuario.IDPersona WHERE usuario.IDUsuario IN (SELECT IDUserFollow FROM seguidor WHERE IDUserOrigin = ?);");
+            preparedStatement.setString(1, idO);
+            resultSet = preparedStatement.executeQuery();
+            JsonObject jsonObject;
+            while (resultSet.next()){
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("puntuacion", resultSet.getInt(1));
+                jsonObject.addProperty("contenido", resultSet.getString(2));
+                jsonObject.addProperty("nombreLibro", resultSet.getString(3));
+                jsonObject.addProperty("nombreAutor", resultSet.getString(4));
+                jsonObject.addProperty("idioma", resultSet.getString(5));
+                jsonObject.addProperty("editorial", resultSet.getString(6));
+                jsonObject.addProperty("fotoID", resultSet.getString(7));
+                jsonObject.addProperty("IDUsuario", resultSet.getString(8));
+                list.add(jsonObject);
+            }
+            return list;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }finally {
+            try{
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+
+    }
 }

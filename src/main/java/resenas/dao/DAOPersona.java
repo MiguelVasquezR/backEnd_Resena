@@ -189,7 +189,7 @@ public class DAOPersona {
     public boolean updatePersonaBiografia(String biografia, String IDPersona){
         try{
             connection = conexion.getConnection();
-            ps = connection.prepareStatement("update informacionpersonal as p set Biografia=? where p.id = ?");
+            ps = connection.prepareStatement(" UPDATE informacionpersonal SET Biografia = ? WHERE ID IN (SELECT i.ID FROM (SELECT ID FROM informacionpersonal) AS i JOIN usuario AS u ON i.ID = u.IDPersona WHERE u.IDUsuario = ? ); ");
             ps.setString(1, biografia);
             ps.setString(2, IDPersona);
             int res = ps.executeUpdate();
@@ -231,4 +231,32 @@ public class DAOPersona {
     }
 
 
+    public String getBiografy(String idUsuario) {
+        Connection connection1 = null;
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try{
+            connection1 = conexion.getConnection();
+            preparedStatement = connection1.prepareStatement("select i.biografia from informacionpersonal as i, usuario as u where i.ID = u.IDPersona and u.idusuario = ?;");
+            preparedStatement.setString(1, idUsuario);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getString(1);
+            }else{
+                return "";
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return "";
+        }finally {
+            try {
+                connection1.close();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+
+
+    }
 }
