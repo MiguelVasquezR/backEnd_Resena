@@ -127,25 +127,39 @@ public class App {
 
         post("/usuario-personales", (request, response) -> {
             idPersona = randomID();
+            System.out.println(request.body());
             Persona persona = gson.fromJson(request.body(), Persona.class);
             persona.setIDPersona(idPersona);
             persona.setfNacimiento(parseDate(request.body()));
+
+            JsonObject jsonObject = new JsonObject();
+            String msj;
             if (daoPersona.createPersone(persona)) {
-                System.out.println("Se guardo Persona");
+                msj = "Se ha guardado";
+            }else{
+                msj = "Ocurrio un error";
             }
-            return "";
+            jsonObject.addProperty("msj", msj);
+            return jsonObject;
         });
 
         post("/usuario-cuenta", (request, response) -> {
             String datos = request.body();
+            System.out.println(datos);
             Usuario usuario = gson.fromJson(datos, Usuario.class);
             idUsuario = randomID();
             usuario.setIDUsuario(idUsuario);
             usuario.setIDPersona(idPersona);
+
+            JsonObject jsonObject = new JsonObject();
+            String msj;
             if (daoUsuario.createUser(usuario)) {
-                System.out.println("Se guardo Usuario");
+                msj = "Se ha guardado";
+            }else{
+                msj = "Ocurrio un error";
             }
-            return "";
+            jsonObject.addProperty("msj", msj);
+            return jsonObject;
         });
 
         post("/usuario-genero", (request, response) -> {
