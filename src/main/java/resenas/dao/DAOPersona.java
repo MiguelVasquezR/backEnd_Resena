@@ -2,6 +2,7 @@ package resenas.dao;
 
 import resenas.conexion.Conexion;
 import resenas.modelo.Persona;
+import resenas.modelo.Resena;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -125,21 +126,24 @@ public class DAOPersona {
     }
 
     public Persona searchPersona(String id){
+        Connection connection1 = null;
+        PreparedStatement ps1= null;
+        ResultSet rs1 = null;
         try{
-            connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from informacionpersonal as p where p.id = ?");
-            ps.setString(1, id);
-            rs = ps.executeQuery();
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select * from informacionpersonal as p where p.id = ?");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
             Persona persona;
-            if (rs.next()){
+            if (rs1.next()){
                 persona = new Persona();
-                persona.setIDPersona(rs.getString(1));
-                persona.setNombre(rs.getString(2));
-                persona.setPaterno(rs.getString(3));
-                persona.setMaterno(rs.getString(4));
-                persona.setfNacimiento(rs.getDate(5));
-                persona.setfDeceso(rs.getDate(6));
-                persona.setBiografia(rs.getString(7));
+                persona.setIDPersona(rs1.getString(1));
+                persona.setNombre(rs1.getString(2));
+                persona.setPaterno(rs1.getString(3));
+                persona.setMaterno(rs1.getString(4));
+                persona.setfNacimiento(rs1.getDate(5));
+                persona.setfDeceso(rs1.getDate(6));
+                persona.setBiografia(rs1.getString(7));
                 return  persona;
             }else{
                 return null;
@@ -149,9 +153,8 @@ public class DAOPersona {
             return null;
         }finally {
             try {
-                connection.close();
-                ps.close();
-                rs.close();
+                connection1.close();
+
             }catch (Exception e){
                 System.out.println(e.getMessage());
             }

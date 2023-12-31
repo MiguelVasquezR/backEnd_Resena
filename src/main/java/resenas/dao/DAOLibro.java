@@ -74,24 +74,27 @@ public class DAOLibro {
     }
 
     public ArrayList getLibrosByAutor(String id){
+        Connection connection1 = null;
+        ResultSet rs1;
+        PreparedStatement ps1;
         ArrayList<Libro> libros = new ArrayList<>();
         try{
-            connection = conexion.getConnection();
-            ps = connection.prepareStatement("select * from libro where IDAutor = ?;");
-            ps.setString(1, id);
-            rs = ps.executeQuery();
+            connection1 = conexion.getConnection();
+            ps1 = connection1.prepareStatement("select * from libro where IDAutor = ?;");
+            ps1.setString(1, id);
+            rs1 = ps1.executeQuery();
             Libro libro;
-            while (rs.next()){
+            while (rs1.next()){
                 libro = new Libro();
-                libro.setIDLibro(rs.getString(1));
-                libro.setTitulo(rs.getString(2));
-                libro.setFoto(rs.getString(3));
-                libro.setNumPag(rs.getInt(4));
-                libro.setFechaPublicacion(rs.getDate(5));
-                libro.setIdioma(rs.getString(6));
-                libro.setEditorial(rs.getString(7));
-                libro.setIDAutor(rs.getString(8));
-                libro.setIDGenero(rs.getString(9));
+                libro.setIDLibro(rs1.getString(1));
+                libro.setTitulo(rs1.getString(2));
+                libro.setFoto(rs1.getString(3));
+                libro.setNumPag(rs1.getInt(4));
+                libro.setFechaPublicacion(rs1.getDate(5));
+                libro.setIdioma(rs1.getString(6));
+                libro.setEditorial(rs1.getString(7));
+                libro.setIDAutor(rs1.getString(8));
+                libro.setIDGenero(rs1.getString(9));
                 libros.add(libro);
             }
             return libros;
@@ -100,7 +103,7 @@ public class DAOLibro {
             return null;
         }finally {
             try{
-                connection.close();
+                connection1.close();
             }catch (Exception e){
                 System.out.println(e.getMessage());
             }

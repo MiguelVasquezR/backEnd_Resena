@@ -4,54 +4,56 @@ public class Foro {
 
     private String IDForo;
     private String Opcion;
-    //private String foto;
     private String Descripcion;
     private String Nombre;
+    private String Foto;
     private String IDUsuario;
 
-    public Foro(){
+    public String getFoto() {
+        return Foto;
     }
 
-    public Foro(String Opcion, String Descripcion, String Nombre) {
-        this.Opcion = Opcion;
-        this.Descripcion = Descripcion;
-        this.Nombre = Nombre;
+    public void setFoto(String foto) {
+        Foto = foto;
     }
 
     public String getIDForo() {
         return IDForo;
     }
 
+    public void setIDForo(String IDForo) {
+        this.IDForo = IDForo;
+    }
+
     public String getOpcion() {
         return Opcion;
+    }
+
+    public void setOpcion(String opcion) {
+        Opcion = opcion;
     }
 
     public String getDescripcion() {
         return Descripcion;
     }
 
+    public void setDescripcion(String descripcion) {
+        Descripcion = descripcion;
+    }
+
     public String getNombre() {
         return Nombre;
+    }
+
+    public void setNombre(String nombre) {
+        Nombre = nombre;
     }
 
     public String getIDUsuario() {
         return IDUsuario;
     }
 
-    public void setIDForo(String IDForo) {
-        this.IDForo = IDForo;
+    public void setIDUsuario(String IDUsuario) {
+        this.IDUsuario = IDUsuario;
     }
-
-    public void setOpcion(String Opcion) {
-        this.Opcion = Opcion;
-    }
-
-    public void setDescripcion(String Descripcion) {
-        this.Descripcion = Descripcion;
-    }
-
-    public void setNombre(String Nombre) {
-        this.Nombre = Nombre;
-    }
-
 }

@@ -17,6 +17,7 @@ public class App {
 
     static Gson gson = new Gson();
     static DAOPersona daoPersona = new DAOPersona();
+    static DAOParticipanteForo daoParticipanteForo = new DAOParticipanteForo();
     static DAOUsuario daoUsuario = new DAOUsuario();
     static DAOSeguidor daoSeguidor = new DAOSeguidor();
     static DAOForo daoForo = new DAOForo();
@@ -35,6 +36,8 @@ public class App {
     static String idForo;
 
     public static void main(String[] args) {
+
+        port(getHerokuAssignedPort());
 
         options("/*", (request, response) -> {
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
@@ -124,25 +127,39 @@ public class App {
 
         post("/usuario-personales", (request, response) -> {
             idPersona = randomID();
+            System.out.println(request.body());
             Persona persona = gson.fromJson(request.body(), Persona.class);
             persona.setIDPersona(idPersona);
             persona.setfNacimiento(parseDate(request.body()));
+
+            JsonObject jsonObject = new JsonObject();
+            String msj;
             if (daoPersona.createPersone(persona)) {
-                System.out.println("Se guardo Persona");
+                msj = "Se ha guardado";
+            }else{
+                msj = "Ocurrio un error";
             }
-            return "";
+            jsonObject.addProperty("msj", msj);
+            return jsonObject;
         });
 
         post("/usuario-cuenta", (request, response) -> {
             String datos = request.body();
+            System.out.println(datos);
             Usuario usuario = gson.fromJson(datos, Usuario.class);
             idUsuario = randomID();
             usuario.setIDUsuario(idUsuario);
             usuario.setIDPersona(idPersona);
+
+            JsonObject jsonObject = new JsonObject();
+            String msj;
             if (daoUsuario.createUser(usuario)) {
-                System.out.println("Se guardo Usuario");
+                msj = "Se ha guardado";
+            }else{
+                msj = "Ocurrio un error";
             }
-            return "";
+            jsonObject.addProperty("msj", msj);
+            return jsonObject;
         });
 
         post("/usuario-genero", (request, response) -> {
@@ -244,12 +261,19 @@ public class App {
         });
 
         get("/publicaciones", (request, response) -> {
-            return gson.toJson(daoPublicacion.getPublicaciones());
+            String id = request.queryParams("IDForo");
+            return gson.toJson(daoPublicacion.getPub(id));
+        });
+
+        get("/participantes", (request, response) -> {
+            String id = request.queryParams("IDForo");
+            return gson.toJson(daoParticipanteForo.getParticipante(id));
         });
 
 
         post("/foro-crear", (request, response) -> {
             String datos = request.body();
+            System.out.println(datos);
             Foro foro = gson.fromJson(datos, Foro.class);
             idForo = randomID();
             foro.setIDForo(idForo);
@@ -261,6 +285,48 @@ public class App {
 
         get("/foros", (request, response) -> {
             return gson.toJson(daoForo.getForos());
+        });
+
+        post("/agregar-participante", (request, response) -> {
+            String IDForo = request.queryParams("IDForo");
+            String IDUser = request.queryParams("IDUser");
+            ParticipanteFoto participanteFoto = new ParticipanteFoto();
+            participanteFoto.setIDPF(randomID());
+            participanteFoto.setIDForo(IDForo);
+            participanteFoto.setIDUsuario(IDUser);
+            JsonObject jsonObject = new JsonObject();
+            String msj;
+            if (daoParticipanteForo.comprobar(participanteFoto)){
+                msj = "Ya en grupo";
+            }else{
+                if (daoParticipanteForo.addParticipanteForo(participanteFoto)){
+                    msj = "Agregado al grupo";
+                }else{
+                    msj = "No se ha agregado";
+                }
+            }
+            jsonObject.addProperty("MSJ", msj);
+            return jsonObject;
+        });
+
+        delete("/delete-participante", (request, response) -> {
+            String IDForo = request.queryParams("IDForo");
+            String IDUser = request.queryParams("IDUser");
+
+            ParticipanteFoto participanteFoto = new ParticipanteFoto();
+            participanteFoto.setIDPF(randomID());
+            participanteFoto.setIDForo(IDForo);
+            participanteFoto.setIDUsuario(IDUser);
+
+            JsonObject jsonObject = new JsonObject();
+            String msj;
+                if (daoParticipanteForo.deleteParticipanteForo(participanteFoto)){
+                    msj = "Eliminado del grupo";
+                }else{
+                    msj = "No se ha Eliminado";
+                }
+            jsonObject.addProperty("MSJ", msj);
+            return jsonObject;
         });
 
 
@@ -498,6 +564,15 @@ public class App {
 
     private static String randomID() {
         return UUID.randomUUID().toString();
+    }
+
+
+    static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
     }
 
 }
